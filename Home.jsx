@@ -4,10 +4,10 @@ import React from "react";
 const HomeScreen = ({ navigation }) => {
     return (
         <View>
-            {/* <Button
+            <Button
                 onPress={() => navigation.navigate("Login")}
                 title="Login"
-            /> */}
+            />
         </View>
     );
 };
