@@ -21,44 +21,38 @@ const client = axios.create({
 const HomeScreen = ({ navigation }) => {
     const username = useSelector((state) => state.auth.username);
     const [manga, setManga] = useState([]);
-    const [coverId, setCoverId] = useState([]);
-    const [coverLink, setCoverLink] = useState([]);
 
-    const getManga = async () => {
-        try {
-            const resManga = await client.get("manga");
-            const _manga = resManga.data.data;
-            // const _mangaTes = resManga.data.data;
-            setManga(_manga);
-            // console.log(_manga[0].relationships[2].id);
+    async function getManga() {
+        const manga = await client.get("manga");
+        return manga;
+    }
 
-            // const id = _manga;
-            const coverId = _manga[0].relationships[2].id;
-            setCoverId(coverId);
-            const resCover = await client.get(`cover/${coverId}`);
-            const _cover = resCover.data.data;
-            setCoverLink(_cover);
-            // console.log(coverLink);
-            // console.log(_cover);
-            // setCoverId(_manga.relationships[2].id);
-            // console.log("res: ", _manga);
-        } catch (err) {
-            console.log(err);
-        }
-    };
-
-    // const getCover = async (id) => {
-    //     try {
-    //         const res = await client.get(`cover/${id}`);
-    //         console.log(res);
-    //     } catch (err) {
-    //         console.log(err);
-    //     }
-    // };
+    async function getMangaCover(coverId) {
+        const cover = await client.get(`cover/${coverId}`);
+        return cover.data.data.attributes.fileName;
+    }
 
     useEffect(() => {
-        getManga();
-        // getCover(coverId);
+        getManga()
+            .then(async (mangaData) => {
+                const mangas = await Promise.all(
+                    mangaData &&
+                        mangaData.data.data.map(async (manga) => {
+                            const mangaObj = { ...manga };
+                            const coverId = mangaObj.relationships.find(
+                                (rl) => rl.type === "cover_art"
+                            ).id;
+                            const mangaCover = await getMangaCover(coverId);
+
+                            mangaObj.cover_filename = mangaCover;
+                            mangaObj.cover_id = coverId;
+
+                            return mangaObj;
+                        })
+                );
+                setManga(mangas);
+            })
+            .catch((error) => console.error("error: ", error));
     }, []);
 
     return (
@@ -68,7 +62,6 @@ const HomeScreen = ({ navigation }) => {
                 data={manga}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => {
-                    // console.log(coverLink.attributes.fileName);
                     return (
                         <View style={styles.mangaItem}>
                             <TouchableOpacity
@@ -76,37 +69,71 @@ const HomeScreen = ({ navigation }) => {
                                 onPress={() =>
                                     navigation.navigate("Details", {
                                         id: item.id,
+                                        title: item.attributes.title.en,
                                     })
                                 }
                             >
-                                <Text style={styles.mangaTitle}>
-                                    {item.attributes.title.en}
-                                </Text>
-                                <Text style={styles.mangaLastChapter}>
-                                    Chapter {item.attributes.lastChapter}
-                                </Text>
-                                <Text style={styles.mangaType}>
-                                    {item.type}
-                                </Text>
+                                <View style={styles.mangaLastChapterContainer}>
+                                    <Text style={styles.mangaLastChapter}>
+                                        Chapter
+                                        {item.attributes.lastChapter
+                                            ? ` ${item.attributes.lastChapter}`
+                                            : " ?"}
+                                    </Text>
+                                </View>
+                                <View style={styles.mangaTypeContainer}>
+                                    {item.type == "manga" && (
+                                        <Image
+                                            source={require("./assets/japan.png")}
+                                            style={{
+                                                width: 20,
+                                                height: 20,
+                                            }}
+                                        ></Image>
+                                    )}
+                                    {item.type == "manhwa" && (
+                                        <Image
+                                            source={require("./assets/south-korea.png")}
+                                            style={{
+                                                width: 20,
+                                                height: 20,
+                                            }}
+                                        ></Image>
+                                    )}
+                                    {item.type == "manhua" && (
+                                        <Image
+                                            source={require("./assets/china.png")}
+                                            style={{
+                                                width: 20,
+                                                height: 20,
+                                            }}
+                                        ></Image>
+                                    )}
+                                    <Text style={styles.mangaType}>
+                                        {item.type}
+                                    </Text>
+                                </View>
                                 <Image
                                     source={{
-                                        uri: `https://uploads.mangadex.org/covers/${item.id}/${coverLink.attributes.fileName}.256.jpg`,
+                                        uri: `https://uploads.mangadex.org/covers/${item.id}/${item.cover_filename}.256.jpg`,
                                     }}
-                                    // source={require("./assets/icon.png")}
-                                    style={{ width: 256, height: 256 }}
+                                    style={styles.mangaCover}
                                 ></Image>
-                                {/* <Text style={styles.mangaCover}>
-                                    {item.relationships[2].id}
-                                </Text> */}
-                                {/* {setCoverId(item.relationships[2].id)} */}
-                                <Text style={styles.mangaTime}>
-                                    {/* {coverLink} */}
-                                    {moment
-                                        .utc(item.attributes.updatedAt)
-                                        .local()
-                                        .startOf("day")
-                                        .fromNow()}
-                                </Text>
+                                <View style={styles.subContainer}>
+                                    <Text style={styles.mangaTitle}>
+                                        {item.attributes.title.en.substring(
+                                            0,
+                                            32
+                                        )}
+                                    </Text>
+                                    <Text style={styles.mangaTime}>
+                                        {moment
+                                            .utc(item.attributes.updatedAt)
+                                            .local()
+                                            .startOf("day")
+                                            .fromNow()}
+                                    </Text>
+                                </View>
                             </TouchableOpacity>
                         </View>
                     );
@@ -121,9 +148,67 @@ export default HomeScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // padding: 1,
         backgroundColor: "#fff",
         alignItems: "center",
         justifyContent: "center",
+        maxWidth: 500,
+    },
+    mangaItem: {
+        flex: 1,
+        alignItems: "center",
+    },
+    mangaContent: {
+        flex: 1,
+    },
+    mangaLastChapterContainer: {
+        position: "absolute",
+        top: 20,
+        right: 20,
+        zIndex: 2,
+        backgroundColor: "white",
+        paddingVertical: 10,
+        paddingHorizontal: 25,
+        borderRadius: 100,
+    },
+    mangaTypeContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        position: "absolute",
+        bottom: 80,
+        left: 20,
+        zIndex: 2,
+        backgroundColor: "white",
+        paddingVertical: 10,
+        paddingHorizontal: 25,
+        borderRadius: 100,
+    },
+    mangaType: {
+        marginLeft: 5,
+        color: "black",
+        textTransform: "capitalize",
+    },
+    mangaCover: {
+        width: 300,
+        height: 300,
+        position: "relative",
+        borderRadius: 50,
+    },
+    subContainer: {
+        flex: 1,
+        flexWrap: "wrap",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        padding: 5,
+        height: 50,
+        // bordercol,
+        // maxHeight: 50,
+    },
+    mangaTitle: {
+        fontWeight: "bold",
+        fontSize: 14,
+    },
+    mangaTime: {
+        // position: "absolute",
+        // top: 10
     },
 });

@@ -29,14 +29,14 @@ export default function MainNavigator() {
                 ) : (
                     <>
                         <Stack.Screen
-                            name="Home"
+                            name="Project M"
                             component={MyDrawer}
                             options={{
                                 headerRight: () => (
                                     <Button
                                         onPress={() => dispatch(logout())}
                                         title="Logout"
-                                        color="#fff"
+                                        color="black"
                                     />
                                 ),
                             }}
@@ -48,6 +48,9 @@ export default function MainNavigator() {
                         <Stack.Screen
                             name="Chapter"
                             component={ChapterScreen}
+                            options={({ route }) => ({
+                                title: `Chapter ${route.params.chapterN}`,
+                            })}
                         />
                     </>
                 )}

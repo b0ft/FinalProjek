@@ -20,12 +20,7 @@ const DetailsScreen = ({ route, navigation }) => {
     const getDetails = async () => {
         try {
             const res = await client.get(`manga/${route.params?.id}/aggregate`);
-            // const _chapter = res.data;
             const _chapter = res.data.volumes.none.chapters;
-            // const _chapterCount = res.data.volumes.none.count;
-            console.log(_chapter);
-            // console.log(Object.keys(_chapter));
-            // console.log(chapters["289"].id);
             setChapters(_chapter);
         } catch (err) {
             console.log(err);
@@ -38,24 +33,27 @@ const DetailsScreen = ({ route, navigation }) => {
 
     return (
         <View>
-            <View>{/* <Text>Atas</Text> */}</View>
+            <View style={styles.titleContainer}>
+                <Text style={styles.title}>{route.params?.title}</Text>
+            </View>
             <View>
                 {/* <Text>{route.params?.id}</Text> */}
                 <FlatList
                     data={Object.keys(chapters)}
                     keyExtractor={(item) => item}
-                    numColumns={5}
+                    numColumns={3}
                     horizontal={false}
                     renderItem={({ item, index }) => {
                         return (
                             <View style={styles.detailsContainer}>
                                 <TouchableOpacity
                                     onPress={() => {
-                                        console.log(chapters[item].id);
                                         navigation.navigate({
                                             name: "Chapter",
                                             params: {
                                                 chapterId: chapters[item].id,
+                                                chapterN:
+                                                    chapters[item].chapter,
                                             },
                                         });
                                     }}
@@ -77,12 +75,19 @@ const DetailsScreen = ({ route, navigation }) => {
 export default DetailsScreen;
 
 const styles = StyleSheet.create({
-    // detailsContainer: {
-    //     flex: 1
-    // }
+    detailsContainer: {
+        flex: 1,
+        alignItems: "center",
+    },
     chapterContainer: {
         marginBottom: 10,
         padding: 10,
         fontSize: 15,
+    },
+    title: {
+        fontSize: 20,
+        textAlign: "center",
+        padding: 10,
+        fontWeight: "700",
     },
 });
