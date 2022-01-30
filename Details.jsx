@@ -1,7 +1,12 @@
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import {
+    View,
+    Text,
+    FlatList,
+    StyleSheet,
+    TouchableOpacity,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 const baseURL = "https://api.mangadex.org/";
 
@@ -48,7 +53,13 @@ const DetailsScreen = ({ route, navigation }) => {
                             <View style={styles.detailsContainer}>
                                 <TouchableOpacity
                                     onPress={() => {
-                                        navigation.navigate("Chapter"), {};
+                                        console.log(chapters[item].id);
+                                        navigation.navigate({
+                                            name: "Chapter",
+                                            params: {
+                                                chapterId: chapters[item].id,
+                                            },
+                                        });
                                     }}
                                 >
                                     {/* <Text>{chapters[item].id}</Text> */}
