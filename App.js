@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
 import MainNavigator from "./navigator";
+import "react-native-gesture-handler";
 
 export default function App() {
     return (

@@ -2,6 +2,9 @@ import { StatusBar } from "expo-status-bar";
 import { Button, StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+// import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
 import HomeScreen from "../Home";
 import LoginScreen from "../Login";
 import DetailsScreen from "../Details";
@@ -9,10 +12,10 @@ import ChapterScreen from "../Chapter";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/authSlice";
 import AboutScreen from "../About";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
+// const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
 
 export default function MainNavigator() {
     const password = useSelector((state) => state.auth.password);
@@ -25,14 +28,10 @@ export default function MainNavigator() {
                     <Stack.Screen name="Login" component={LoginScreen} />
                 ) : (
                     <>
-                        <Stack.Screen name="MainApp" component={MainApp} />
                         <Stack.Screen
                             name="Home"
-                            component={HomeScreen}
+                            component={MyDrawer}
                             options={{
-                                // headerTitle: (props) => (
-                                //     <LogoTitle {...props} />
-                                // ),
                                 headerRight: () => (
                                     <Button
                                         onPress={() => dispatch(logout())}
@@ -57,12 +56,11 @@ export default function MainNavigator() {
     );
 }
 
-const MainApp = () => (
-    <Tab.Navigator>
-        <Tab.Screen name="About" component={AboutScreen} />
-        {/* <Tab.Screen name="AddScreen" component={AddScreen} />
-        <Tab.Screen name="SkillProjectScreen" component={SkillProjectScreen} /> */}
-    </Tab.Navigator>
+const MyDrawer = () => (
+    <Drawer.Navigator screenOptions={{ headerShown: false }}>
+        <Drawer.Screen name="Home" component={HomeScreen} />
+        <Drawer.Screen name="About Me" component={AboutScreen} />
+    </Drawer.Navigator>
 );
 
 const styles = StyleSheet.create({

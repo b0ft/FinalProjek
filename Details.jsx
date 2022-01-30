@@ -38,15 +38,13 @@ const DetailsScreen = ({ route, navigation }) => {
 
     return (
         <View>
-            <View>
-                <Text>Atas</Text>
-            </View>
+            <View>{/* <Text>Atas</Text> */}</View>
             <View>
                 {/* <Text>{route.params?.id}</Text> */}
                 <FlatList
                     data={Object.keys(chapters)}
                     keyExtractor={(item) => item}
-                    numColumns={3}
+                    numColumns={5}
                     horizontal={false}
                     renderItem={({ item, index }) => {
                         return (
