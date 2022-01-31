@@ -23,7 +23,9 @@ const HomeScreen = ({ navigation }) => {
     const [manga, setManga] = useState([]);
 
     async function getManga() {
-        const manga = await client.get("manga");
+        const manga = await client.get(
+            "manga?hasAvailableChapters=1&status[]=ongoing"
+        );
         return manga;
     }
 
@@ -70,6 +72,9 @@ const HomeScreen = ({ navigation }) => {
                                     navigation.navigate("Details", {
                                         id: item.id,
                                         title: item.attributes.title.en,
+                                        description:
+                                            item.attributes.description.en,
+                                        fileName: item.cover_filename,
                                     })
                                 }
                             >

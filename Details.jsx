@@ -4,6 +4,7 @@ import {
     FlatList,
     StyleSheet,
     TouchableOpacity,
+    Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
@@ -35,6 +36,15 @@ const DetailsScreen = ({ route, navigation }) => {
         <View>
             <View style={styles.titleContainer}>
                 <Text style={styles.title}>{route.params?.title}</Text>
+                <Image
+                    source={{
+                        uri: `https://uploads.mangadex.org/covers/${route.params?.id}/${route.params?.fileName}.256.jpg`,
+                    }}
+                    style={{ width: 300, height: 300, resizeMode: "contain" }}
+                ></Image>
+                <Text style={styles.description}>
+                    {route.params?.description.substring(0, 250)}
+                </Text>
             </View>
             <View>
                 {/* <Text>{route.params?.id}</Text> */}
@@ -84,10 +94,20 @@ const styles = StyleSheet.create({
         padding: 10,
         fontSize: 15,
     },
+    titleContainer: {
+        alignItems: "center",
+        // borderBottomWidth: 5,
+    },
     title: {
         fontSize: 20,
         textAlign: "center",
         padding: 10,
         fontWeight: "700",
+    },
+    description: {
+        fontSize: 15,
+        textAlign: "center",
+        padding: 10,
+        // fontWeight: "700",
     },
 });

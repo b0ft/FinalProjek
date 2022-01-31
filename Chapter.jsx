@@ -55,7 +55,7 @@ const ChapterScreen = ({ route, navigation }) => {
                     }}
                 />
             ) : (
-                <Text style={styles.warning}>Gambar tidak dapat ditemukan</Text>
+                <Text style={styles.warning}>Loading...</Text>
             )}
         </View>
     );
